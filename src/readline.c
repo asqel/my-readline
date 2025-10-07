@@ -3,5 +3,5 @@
 
 
 char *readline(char *prompt) {
-		
+	return NULL;		
 }
