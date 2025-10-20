@@ -4,7 +4,7 @@ OBJ = $(SRC:.c=.o)
 CC = gcc
 LD = gcc
 
-CFLAGS = -Wall -Wextra -Iinclude
+CFLAGS = -Wall -Wextra -Iinclude -fPIC
 LDFLAGS = -shared
 
 NAME = libreadline
@@ -28,6 +28,9 @@ clean:
 fclean: clean
 	rm -rf $(NAME_A) $(NAME_SO)
 
-re: fclean clean
+re: fclean all
 
-.PHONY: re fclean clean all
+test: all
+	make -C test re test
+
+.PHONY: re fclean clean all test

@@ -7,18 +7,15 @@ LD = gcc
 CFLAGS = -Wall -Wextra -I../include
 LDFLAGS = 
 
-NAME = test
+NAME = test_exe
 
 all: $(NAME)
 
-$(NAME): $(OBJ) ../libreadline.a
+$(NAME): $(OBJ)
 	$(LD) $(LDFLAGS) $^ ../libreadline.a -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
-
-../libreadline.a:
-	make -C ../
 
 clean:
 	rm -rf $(OBJ)
@@ -26,7 +23,10 @@ clean:
 fclean: clean
 	rm -rf $(NAME)
 
-re: fclean clean
+re: fclean all
 
-.PHONY: re fclean clean all
+test: all
+	./$(NAME)
+
+.PHONY: re fclean clean all test
 
