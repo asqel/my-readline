@@ -27,6 +27,7 @@ re: fclean all
 
 test: all
 	./$(NAME)
+	reset
 
 .PHONY: re fclean clean all test
 
