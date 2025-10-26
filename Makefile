@@ -31,6 +31,7 @@ fclean: clean
 re: fclean all
 
 test: all
-	make -C test re test
+	make -C test re
+	valgrind ./test/test_exe 2> f
 
 .PHONY: re fclean clean all test

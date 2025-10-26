@@ -47,10 +47,11 @@ char *readline(char *prompt) {
 			}
 			else {
 				fprintf(stderr, "pos %d, len %d\n", pos, buffer.len);
-				memmove(&buffer.data[pos - 1], &buffer.data[pos], buffer.len - pos);
-				buffer.len--;
 				for (int i = 0; i < buffer.len - pos + 1; i++)
 					write(1, "\b \b", 3);
+				write(1, "\b \b", 3);
+				memmove(&buffer.data[pos - 1], &buffer.data[pos], buffer.len - pos);
+				buffer.len--;
 				pos--;
 			}
 
