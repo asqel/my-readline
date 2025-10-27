@@ -45,15 +45,32 @@ char *readline(char *prompt) {
 				fprintf(stderr, "len %d pos %d\n", buffer.len, pos);
 				buffer_insert_c(&buffer, c, pos++);
 			}
-			else {
-				fprintf(stderr, "pos %d, len %d\n", pos, buffer.len);
-				for (int i = 0; i < buffer.len - pos + 1; i++)
+			else if (pos) {
+				fprintf(stderr, "erasing at %d len %d\n", pos, buffer.len);
+				fflush(stderr);
+				if (pos == buffer.len) {
 					write(1, "\b \b", 3);
-				write(1, "\b \b", 3);
-				memmove(&buffer.data[pos - 1], &buffer.data[pos], buffer.len - pos);
-				buffer.len--;
+					buffer.len--;
+					pos--;
+					continue;
+				}
+				for (int i = 0; i < buffer.len - pos; i++)
+					write(1, " ", 1);
+				for (int i = 0; i < buffer.len - pos; i++)
+					write(1, "\b", 1);
+				write(1, "\b", 1);
+				write(1, &buffer.data[pos], buffer.len - pos);
+				for (int i = 0; i < buffer.len - pos; i++)
+					buffer.data[pos + i - 1] = buffer.data[pos + i];
+				for (int i = 0; i < buffer.len - pos; i++)
+					write(1, "\b", 1);
 				pos--;
+				buffer.len--;
+				continue;
+
 			}
+			else if (c == 0x7f)
+				continue;
 
 			write(1, &buffer.data[pos - 1], buffer.len - pos + 1);
 			if (buffer.len > pos)

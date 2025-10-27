@@ -34,21 +34,74 @@ len 27 pos 27
 len 28 pos 28
 len 29 pos 29
 len 30 pos 30
-==1971== 
-==1971== Process terminating with default action of signal 2 (SIGINT)
-==1971==    at 0x4980852: read (read.c:26)
-==1971==    by 0x109583: readline (readline.c:17)
-==1971==    by 0x10925A: main (in /home/asqel/Github/my-readline/test/test_exe)
+len 31 pos 31
+len 32 pos 32
+len 33 pos 33
+len 34 pos 34
+len 35 pos 35
+len 36 pos 36
+len 37 pos 37
+len 38 pos 38
+len 39 pos 39
+len 40 pos 40
+len 41 pos 41
+len 42 pos 42
+len 43 pos 43
+len 44 pos 44
+len 45 pos 45
+len 46 pos 46
+len 47 pos 47
+len 48 pos 48
+len 49 pos 49
+len 50 pos 50
+len 51 pos 51
+len 52 pos 52
+len 53 pos 53
+len 54 pos 54
+len 55 pos 55
+len 56 pos 56
+len 57 pos 57
+len 58 pos 58
+len 59 pos 59
+len 60 pos 60
+len 61 pos 61
+len 62 pos 62
+len 63 pos 63
+len 64 pos 64
+len 65 pos 65
+len 66 pos 66
+len 67 pos 67
+len 68 pos 68
+len 69 pos 69
+len 70 pos 70
+len 71 pos 71
+len 72 pos 72
+len 73 pos 73
+erasing at 74 len 74
+erasing at 73 len 73
+erasing at 72 len 72
+erasing at 71 len 71
+erasing at 70 len 70
+erasing at 69 len 69
+erasing at 68 len 68
+erasing at 67 len 67
+erasing at 66 len 66
+erasing at 65 len 65
+erasing at 64 len 64
+erasing at 63 len 63
+erasing at 62 len 62
+erasing at 61 len 61
+erasing at 60 len 60
 ==1971== 
 ==1971== HEAP SUMMARY:
 ==1971==     in use at exit: 1,024 bytes in 1 blocks
 ==1971==   total heap usage: 1 allocs, 0 frees, 1,024 bytes allocated
 ==1971== 
 ==1971== LEAK SUMMARY:
-==1971==    definitely lost: 0 bytes in 0 blocks
+==1971==    definitely lost: 1,024 bytes in 1 blocks
 ==1971==    indirectly lost: 0 bytes in 0 blocks
 ==1971==      possibly lost: 0 bytes in 0 blocks
-==1971==    still reachable: 1,024 bytes in 1 blocks
+==1971==    still reachable: 0 bytes in 0 blocks
 ==1971==         suppressed: 0 bytes in 0 blocks
 ==1971== Rerun with --leak-check=full to see details of leaked memory
 ==1971== 
