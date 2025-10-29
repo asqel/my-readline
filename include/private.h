@@ -19,8 +19,7 @@ typedef struct {
 	int old_stdin_flags;
 	struct sigaction old_act[7];
 
-	buffer_t buffer;
-	int pos;
+	buffer_t stdin_stash;
 } readline_info_t;
 
 extern readline_info_t readline_info;
