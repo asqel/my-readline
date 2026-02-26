@@ -4,14 +4,14 @@
 #include <errno.h>
 #include <unistd.h>
 
-#define BUFF_INC (1024)
+#define BUFF_INC (1024 * sizeof(uint16_t))
 
-int buffer_append_c(buffer_t *buffer, char c) {
+int buffer_append(buffer_t *buffer, uint16_t c) {
 	if (!buffer)
 		return 0;
 
-	if (buffer->len == buffer->alloc_len) {
-		char *new_data = realloc(buffer->data, buffer->alloc_len + BUFF_INC);
+	if (buffer->len * sizeof(uint16_t) == buffer->alloc_len) {
+		uint16_t *new_data = realloc(buffer->data, buffer->alloc_len + BUFF_INC);
 		if (!new_data)
 			return 1;
 		buffer->data = new_data;
@@ -23,10 +23,14 @@ int buffer_append_c(buffer_t *buffer, char c) {
 	return 0;
 }
 
-int buffer_insert_c(buffer_t *buffer, char c, size_t pos) {
-	if (buffer_append_c(buffer, c))
+int buffer_append_c(buffer_t *buffer, char c) {
+	return buffer_append(buffer, MK_CHAR(c, TYPE_CHAR);
+}
+
+int buffer_insert(buffer_t *buffer, uint16_t c, size_t pos) {
+	if (buffer_append(buffer, c))
 		return 1;
-	memmove(&buffer->data[pos + 1], &buffer->data[pos], buffer->len - pos);
+	memmove(&buffer->data[pos + 1], &buffer->data[pos], (buffer->len - pos) * sizeof(uint16_t));
 	buffer->data[pos] = c;
 	return 0;
 }

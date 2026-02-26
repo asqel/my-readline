@@ -4,12 +4,21 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stdint.h>
 
 typedef struct {
-	char *data;
+	uint16_t *data; // val: &0xff, type >> 8
 	size_t len;
 	size_t alloc_len;
 } buffer_t;
+
+#define CHAR_TYPE(X) ((uint8_t)(X >> 8))
+#define CHAR_VAL(X) ((char)x & 0xff)
+#define MK_CHAR(X, T) (((uint16_t)x & 0xff) | (((uint16_t)T) << 8))
+
+enum {
+	TYPE_CHAR
+};
 
 typedef struct {
 	struct termios tty;

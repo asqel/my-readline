@@ -5,12 +5,6 @@
 
 readline_info_t readline_info = {0};
 
-static int signal_from_idx(int i) {
-	if (i < 0 || i >= 7)
-		return -1;
-	int sigs[7] = {SIGINT, SIGWINCH, SIGTSTP, SIGCONT, SIGTERM, SIGHUP, SIGQUIT};
-	return sigs[i];
-}
 
 static int install_signals() {
 	for (int i = 0; i < 7; i++) {
@@ -25,7 +19,7 @@ static int install_signals() {
 }
 
 int readline_init() {
-	//install_signals();
+	install_signals();
 	int flags = fcntl(0, F_GETFL, 0);
 	if (flags == -1)
 		return 1;
