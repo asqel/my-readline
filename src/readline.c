@@ -1,82 +1,98 @@
 #include "private.h"
-#include <errno.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
+#include <termios.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
 #include <string.h>
 
+//void redisplay(
+
+
+/*
+PLAN:
+	update_event -> blocking read
+	treat_event
+		if ev == '\n' -> return
+	check win size
+		if -> redisplay
+
+store
+x, y as index
+lines as char *, \n (if real \n)
+*/
+void terminal_get_size(int *w, int *h) {
+	struct winsize win;
+	ioctl(0, TIOCGWINSZ, &win);
+
+	*w = win.ws_col;
+	*h = win.ws_row;
+}
+
+#define UP 'A'
+#define DOWN 'B'
+#define RIGHT 'C'
+#define LEFT 'D'
+
+static int x = 0;
+static int y = 0;
+static int width = 1;
+static int height = 0;
+char *screen = NULL;
+int screen_size = 0;
+
+void redisplay() {
+	char *screen = readline_info.screen;
+int width = readline_info.width;
+	int height = readline_info.height;
+	int org[2] = {readline_info.org_x, readline_info.org_y};
+	int cursor[2] = {readline_info.cx, readline_info.cx};
+
+	if (readline_info.cy - 1)
+		dprintf(1, "\e[%dF", readline_info.cy - 1);
+	dprintf(1, "\e[0j");
+	int off = 0;
+	for (int i = 0; i < 3; i++) {
+		write(1, &screen[off], strnlen(&screen[off], width));
+		dprintf(2, "%d|%d", i, off);
+		dprintf(2, "|\n");
+		if (i != height -1)
+			dprintf(1, "\n\r");
+		off += width;
+	}
+	dprintf(1, "\e[%dA", readline_info.cy - 2);
+	//write(2, "START\n", 6);
+	//write(2, screen, height * width);
+	//write(2, "END--\n", 6);
+}
+
 char *readline(char *prompt) {
-	size_t input_alloc_len = 0;
-	size_t input_len = 0;
-	char *input = NULL;
+	terminal_get_size(&readline_info.width, &readline_info.height);
 	
-	buffer_t buffer = (buffer_t){0};
-	int pos = 0;
-	while (1) { 
+	readline_info.cx = 1;
+	readline_info.cy = 1;
+	//memset(readline_info.screen, 'A', readline_info.width * 2);
+	while (1) {
 		char c = 0;
-		int count = read(0, &c, 1);
-		if (count == 0)
-			break;
-		if (count == -1 && errno == EAGAIN)
-			continue;
-		if (c == 4)
-			return NULL;
-		if (c == '\e') {
-			char code[3] = {0};
-			count = read(0, code, 2);
-			if (count == 0)
-				return NULL;
-			if (count < 0)
-				continue;
-			if (!strcmp(code,  "[C")) {
-				if (pos < buffer.len) {
-					pos++;
-					write(1, &buffer.data[pos - 1], 1);
-				}
+		int r = read(1, &c, 1);		
+		if (r == 1) {
+	//		if (c == 0x0a)
+	//			readline_info.cy += 1;
+	//		else if (c == '\t')
+	//			redisplay();
+			//else if (strchr("hjkl", c)) {
+			//	char *base = "hjkl";
+			//	int idx = (int)(strchr(base, c) - base);
+			//	dprintf(1, "idx %d", idx);
+			//	move("DBAC"[idx], 1);
+			//}
+			if (' ' <= c && c <= '~') {
+				dprintf(1, "%c", c);
 			}
-			else if (!strcmp(code, "[D"))
-				if (pos > 0) {
-					pos--;
-					write(1, "\b", 1);
-				}
+			else
+				dprintf(1, "\n%x\n", (unsigned char)c);
 		}
-		else {
-			if (c != 0x7f) {
-				fprintf(stderr, "len %d pos %d\n", buffer.len, pos);
-				buffer_insert_c(&buffer, c, pos++);
-			}
-			else if (pos) {
-				fprintf(stderr, "erasing at %d len %d\n", pos, buffer.len);
-				fflush(stderr);
-				if (pos == buffer.len) {
-					write(1, "\b \b", 3);
-					buffer.len--;
-					pos--;
-					continue;
-				}
-				for (int i = 0; i < buffer.len - pos; i++)
-					write(1, " ", 1);
-				for (int i = 0; i < buffer.len - pos; i++)
-					write(1, "\b", 1);
-				write(1, "\b", 1);
-				write(1, &buffer.data[pos], buffer.len - pos);
-				for (int i = 0; i < buffer.len - pos; i++)
-					buffer.data[pos + i - 1] = buffer.data[pos + i];
-				for (int i = 0; i < buffer.len - pos; i++)
-					write(1, "\b", 1);
-				pos--;
-				buffer.len--;
-				continue;
-
-			}
-			else if (c == 0x7f)
-				continue;
-
-			write(1, &buffer.data[pos - 1], buffer.len - pos + 1);
-			if (buffer.len > pos)
-				for (int i = 0; i < buffer.len - pos; i++)
-					write(1, "\b", 1);
-		}
+		else
+			dprintf(1, "Err");
 	}
 	return NULL;		
 }

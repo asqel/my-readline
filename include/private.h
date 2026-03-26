@@ -5,37 +5,50 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <stdint.h>
+#include <unistd.h>
 
 typedef struct {
-	uint16_t *data; // val: &0xff, type >> 8
+	char **lines;
+	size_t len;
+} lines_t;
+
+typedef struct {
+	struct termios old_tty;
+	int fd;
+} tty_t;
+
+typedef struct {
+	uint8_t *data;
 	size_t len;
 	size_t alloc_len;
 } buffer_t;
 
-#define CHAR_TYPE(X) ((uint8_t)(X >> 8))
-#define CHAR_VAL(X) ((char)x & 0xff)
-#define MK_CHAR(X, T) (((uint16_t)x & 0xff) | (((uint16_t)T) << 8))
-
-enum {
-	TYPE_CHAR
-};
-
 typedef struct {
-	struct termios tty;
+	int is_init;
 	int width;
 	int height;
-	int is_init;
-	int old_stdin_flags;
-	struct sigaction old_act[7];
+	char *screen;
+	int cx;
+	int cy;
+	tty_t tty;
 
-	buffer_t stdin_stash;
+	buffer_t stash;
+	lines_t lines;
+	int new_width;
+	int new_height;
+	int org_x;
+	int org_y;
 } readline_info_t;
 
 extern readline_info_t readline_info;
 
-void readline_sig_handler(int sig);
+int readline_init();
+void readline_exit();
 
-int buffer_append_c(buffer_t *buffer, char c);
-int buffer_insert_c(buffer_t *buffer, char c, size_t pos);
+void buffer_free(buffer_t *buffer);
+int buffer_insert(buffer_t *buffer, char c, size_t pos);
+int buffer_append(buffer_t *buffer, char c);
+
+void terminal_get_pos(int *x, int *y);
 
 #endif

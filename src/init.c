@@ -5,43 +5,23 @@
 
 readline_info_t readline_info = {0};
 
-
-static int install_signals() {
-	for (int i = 0; i < 7; i++) {
-		int sig = signal_from_idx(i);
-		struct sigaction act;
-
-		act.sa_handler = &readline_sig_handler;
-		sigemptyset(&act.sa_mask);
-		act.sa_flags = 0;
-		sigaction(sig, &act, &readline_info.old_act[i]);
-	}
+static int init_tty() {
+	readline_info.tty.fd = open("/dev/tty", O_RDWR);
+	if (readline_info.tty.fd < 0)
+		return 1;
+	struct termios tty;
+	tcgetattr(readline_info.tty.fd, &readline_info.tty.old_tty);
+	tty = readline_info.tty.old_tty;
+	tty.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(readline_info.tty.fd, TCSANOW, &tty);
+	return 0;
 }
 
 int readline_init() {
-	install_signals();
-	int flags = fcntl(0, F_GETFL, 0);
-	if (flags == -1)
+	if (init_tty())
 		return 1;
-	readline_info.old_stdin_flags = flags;
-	flags |= O_NONBLOCK;
-	if (fcntl(0, F_SETFL, flags) == -1)
-		return 1;
-	struct termios tty;
-
-	if (tcgetattr(0, &tty) == -1) {
-		fcntl(0, F_SETFL, readline_info.old_stdin_flags);
-		return 1;
-	}
-	readline_info.tty = tty;
-
-	tty.c_lflag &= ~(ECHO);
-	tty.c_lflag &= ~(ICANON);
-	if (tcsetattr(0, TCSAFLUSH, &tty) == -1) {
-		fcntl(0, F_SETFL, readline_info.old_stdin_flags);
-		return 1;
-	}
-
+	readline_info.is_init = 1;
+	write(1, "\e[?2004h", 8);
 	return 0;
 }
 
